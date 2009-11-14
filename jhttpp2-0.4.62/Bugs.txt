@@ -1,0 +1,23 @@
+Known Bugs
+----------
+
+20.06.2001 BKohl
+
+1. Win32 Java2 JRE1.3: If you starts jHTTPp2 BEFORE your internet-connection,
+some (??) hosts can not be accessed (Host not found.)
+Solution: Connect first to the internet, then start jHTTPp2.
+Reason: Should be a bug? in the JRE...
+Please write if this bug occurs also on other operating systems (or better: how to avoid this failure!)
+
+
+30.07.2001
+
+jHTTPp2 doesn't work very well with some ISP or web server (with all filters disabled!)
+ I didn't locate the problem yet, but I think it's a bug in the header parsing and/or
+the connection behaviour (jHTTPp2 keeps the connection always up,
+also when the server sent a connection: close header, because jHTTPp2 didn't look at
+any server header)
+
+31.08.2001
+
+Incompatible with instant messengers and download manager

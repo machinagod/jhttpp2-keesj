@@ -1,0 +1,3 @@
+New features should be posted to the mailing list and added to this TODO file.
+
+Look at the mailing list archive at http://sourceforge.net/mail/?group_id=25114

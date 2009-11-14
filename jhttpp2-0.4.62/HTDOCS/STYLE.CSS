@@ -1,0 +1,124 @@
+// jHTTPp2 Proxy 0.4.61
+// http://jhttp2.sourceforge.net
+
+.blabla { font-weight: bold; }  /* muß für style.css eingetragen sein, erster CSS-Eintrag wird sonst verschluckt !!! */
+
+body { BACKGROUND-COLOR: #ffffff; }
+//BACKGROUND-IMAGE: url('expando2.gif'); }
+
+/* style_mozilla_linux.css */
+
+/* GLOBAL font-family Settings*/
+file, input, select, textarea, option, b, p, td, body { font-family: Verdana, Helvetica, sans-serif; }
+a { text-decoration: none;  }
+
+form { border-width:1px; border-color:#9B9B9B; border-style:solid; padding:1px; }
+
+td, input, select, textarea
+{ font-size:12px; font-family:Verdana,sans-serif; } //font-weight:bold; }
+input, select, textarea
+{ color:#0000CC; }
+
+.Bereich, .Feld
+{ background-color:#FFFFFF; width:100px; border:1px solid #9B9B9B; }
+.Auswahl
+{ background-color:#FFFFFF; width:100px; border:1px solid #9B9B9B; }
+.Check, .Radio
+{ background-color:#FFFFFF; border:1px solid #9B9B9B; }
+.Button
+{ background-color:#FFFFFF; color:#000000; width:100px; border:1px solid
+
+
+.f10 { font-size: 12px; }
+.f12 { font-size: 14px; }
+a.bold { font-weight: bold; } /* Abweichung von MSIE "a" muß vor Klasse stehen */
+td.mailprint { font-size:15px; }
+td.mailprint1 { font-size:12px; }
+td.mailprint2 { font-size:15px; }
+td.mailprint3 { font-size:18px; }
+td.mailprint4 { font-size:21px; }
+td.mailprint5 { font-size:23px; }
+
+/* CLASSIFIED font-size Settings*/
+a.mi, .mi2, .ms, .sn, .h1, .c1 {  font-size: 11px; }
+a.mi2, .ms2 { font-size: 10px; }
+
+/* white */ 
+.white { color: #ffffff; }
+
+
+/* SUBNAV */
+.sn { color: #000000; line-height: 15px;} 
+b.sn { color: #ffffff;  } 
+
+
+/* input */
+
+.i2 { font-size: 13px; }
+.i4 { font-size: 13px; }
+.i5 { font-size: 13px;  }
+.i10 { font-size: 13px;  }
+.i15 { font-size: 13px;  }
+.i20 { font-size: 13px;  }
+.i25 { font-size: 13px;  }
+.i30 { font-size: 13px;  }
+.i35 { font-size: 13px;  }
+.i40 { font-size: 13px;  }
+.i50 { font-size: 13px;  }
+.i60 { font-size: 13px;  }
+ 
+
+/* textarea */
+
+.t86x15 { width:630px; height: 260px; font-size: 13px; }
+.t86x5 { width:630px; height: 90px; font-size: 13px; }
+.t53x7 { width:455px; height: 140px; font-size: 13px; }
+.t45x3 { width:370px; height: 52px; font-size: 13px; }
+.t40x10 { width:280px; height: 192px; font-size: 13px; }
+
+
+/* header */
+
+.h1 { font-weight: bold; }  
+.h2 { font-weight: bold; color: #ffffff; }  
+.h2sort { font-weight: bold; color: #c0cad4; }  
+
+
+/* TopNav */
+
+.status { font-size: 13px; font-weight: bold;  color: #ffffff; background-color: #324C62 }
+.claim { font-weight: bold; color: #000000; font-size: 13px; }
+ 
+
+/* Others */
+
+.date 	{color: #ffffff; font-weight: bold; }
+
+.news { padding: 10px; }
+
+/* GLOBAL anchor Settings */
+
+a {text-decoration: none;  }
+a:hover {text-decoration: underline; }
+
+
+
+/* TIAG */
+
+
+.tiagnav {  font-size:10px; font-family:verdana, arial, helvetica, sans-serif;}
+.tiagtitle { text-decoration: none;  font-size:10px; font-weight: bold; font-family:verdana, arial, helvetica, sans-serif;}
+.tiagtext {font-size:11px; line-height: 14px; font-family:verdana, arial, helvetica, sans-serif;}
+.tiaghead { text-decoration: none; font-size:18px; line-height: 20px; font-weight: bold; font-family:verdana, arial, helvetica, sans-serif;}
+.tiagrubrik {  font-size:24px; font-weight: bold; font-family:verdana, arial, helvetica, sans-serif;}
+.tiagmenue {  font-size:11px; font-family:verdana, arial, helvetica, sans-serif; line-height: 20px; font-weight: bold;}
+.tiagsub { text-decoration: none; font-size:12px; line-height: 14px; font-weight: bold; font-family:verdana, arial, helvetica, sans-serif;}
+
+/* WINSOME */
+
+.headline { font-size: 18px; color: #324c62; font-weight: bold; }
+.subline { font-size: 12px; color: #71879A; }
+.subheadline { color: #324c62; font-weight: bold; letter-spacing: 1px}
+.bildunterschrift { color: #71879a; }
+.zitat { font-size: 12px; color: #000000; font-weight: bold; }
+.fussnote { font-style: italic; color: #000000; }

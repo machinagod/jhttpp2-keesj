@@ -1,0 +1,75 @@
+/*
+ * Benjamin Kohl
+ * 10. April 2003
+ */
+
+body { 
+		color:           black;
+		background:      white;
+		background-color: #ffffff;
+		font-weight:     normal;
+		font-family:     Verdana, sans-serif;
+		font-style:      normal;
+  		text-decoration: none;
+		background-image: url('LLbackground.gif'); 
+		margin: 15px 14px 14px 14px;
+		padding: 0;
+		text-align: left;
+		font-size: 12px;
+}
+p,div,td { 
+		font-size: 12px; 
+		line-height: 14px;
+}
+
+a:link 		{ text-decoration:none; 	color:#000099}
+a:hover		{ color: blue;	text-decoration:underline;}
+a:visited	{ text-decoration:none; 	color:#CC0000}
+a:active 	{ text-decoration:none; 	color:#003366}
+
+table		{ border: 1px solid #848484; }
+
+img {
+		padding: 2px 0 2px 2px;
+		margin: 5px 5px 2px 0; 
+}
+
+.autor         	{ background: #CCCCCC; color: #000000; padding: 3px }
+
+.small          { font-size: 10px; }
+
+.quelle         { font-size: 60% }
+
+.text           { line-height: 120% }
+
+.einzug-links   { margin-left: 20px }
+
+.einzug         { text-indent: 20px }
+
+.thema          { background: #003366; color: #FFFFFF }
+
+.rubriken	{ background: #003366; color: #FFFFFF; padding: 3px }
+
+.kasten {
+		background: #CCCCCC;
+		color: #000000;
+		border: 1px solid #848484;
+		padding: 2px 0 2px 2px;
+		margin: 5px 5px 2px 0; 
+		font-size: 11px;
+}
+
+.logo {
+		background: #FFFFFF;
+		border: 1px solid #848484;
+		border-style:solid;
+		padding: 2px 2px 2px 2px;
+		margin: 5px 5px 2px 0; 
+		font-size: 11px;
+}
+
+.rahmen		{ border:1px;  }
+	
+h1 		{ font-size: 16px;}
+
+h2 		{ font-size: 14px; }

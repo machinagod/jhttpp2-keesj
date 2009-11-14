@@ -1,0 +1,2 @@
+Please send Comments,Bugs, Questions to the mailing-list mailto:jhttp2-devel@lists.sourceforge.net
+To subscribe visit http://lists.sourceforge.net/lists/listinfo/jhttp2-devel

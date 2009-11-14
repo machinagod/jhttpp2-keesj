@@ -1,11 +1,9 @@
+package jhttpp2;
 /* Written and copyright 2001 Benjamin Kohl.
  * Distributed under the GNU General Public License; see the README file.
  * This code comes with NO WARRANTY.
  */
 
-import Jhttpp2Server;
-import Jhttpp2HTTPSession;
-import Jhttpp2InputStream;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.IOException;

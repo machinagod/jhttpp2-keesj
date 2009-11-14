@@ -1,3 +1,4 @@
+package jhttpp2;
 /* Written and copyright 2001-2003 Benjamin Kohl.
  * Distributed under the GNU General Public License; see the README file.
  * This code comes with NO WARRANTY.
@@ -6,12 +7,11 @@
  *	Benjamin Kohl <bkohl@users.sf.net>
  *	Artem Melnik <mandara@mac.com>
  * Created:	10.2001
- *
+ **/
 import java.util.Enumeration;
 import java.util.Properties;
 import java.io.IOException;
 
-import Jhttpp2Server;
 
 public class Jhttpp2Admin {
   /*****************************************

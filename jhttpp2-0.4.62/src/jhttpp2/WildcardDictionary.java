@@ -1,3 +1,4 @@
+package jhttpp2;
 // WildcardDictionary - a dictionary with wildcard lookups
 //
 // Copyright (C) 1996 by Jef Poskanzer <jef@acme.com>.  All rights reserved.

@@ -1,3 +1,4 @@
+package jhttpp2;
 /* Written and copyright 2001-2003 Benjamin Kohl.
  * Distributed under the GNU General Public License; see the README file.
  * This code comes with NO WARRANTY.
@@ -16,9 +17,6 @@ import java.util.Vector;
 import java.util.Properties;
 import java.util.Date;
 
-import Jhttpp2HTTPSession;
-import WildcardDictionary;
-import OnURLAction;
 
 public class Jhttpp2Server implements Runnable
 {

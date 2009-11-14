@@ -1,4 +1,4 @@
-package jhttpp2;
+package jhttpp2.admin;
 
 /* Written and copyright 2001-2003 Benjamin Kohl.
  * Distributed under the GNU General Public License; see the README file.
@@ -12,6 +12,11 @@ package jhttpp2;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.io.IOException;
+
+import jhttpp2.Jhttpp2Server;
+import jhttpp2.Jhttpp2URLMatch;
+import jhttpp2.Jhttpp2Utils;
+import jhttpp2.OnURLAction;
 
 public class Jhttpp2Admin {
 	/*****************************************

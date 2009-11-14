@@ -11,12 +11,17 @@ import java.io.BufferedInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * File: Jhttpp2BufferedFilterStream.java
  * 
  * @author Benjamin Kohl
  */
 public class Jhttpp2ClientInputStream extends BufferedInputStream {
+	private static Log log = LogFactory.getLog(Jhttpp2ClientInputStream.class);
+	
 	private String buf;
 	private int lread = 0;
 	/**
@@ -120,8 +125,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 						Jhttpp2URLMatch match = server
 								.findMatch(this.remote_host_name + url);
 						if (match != null) {
-							if (server.debug)
-								System.out.println("Match found!");
+							log.debug("Match found!");
 							cookies_enabled = match.getCookiesEnabled();
 							if (match.getActionIndex() == -1)
 								break;
@@ -156,8 +160,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 					} catch (NumberFormatException e) {
 						statuscode = Jhttpp2HTTPSession.SC_CLIENT_ERROR;
 					}
-					if (server.debug)
-						server.writeLog("read_f: content_len: " + content_len);
+					log.debug("read_f: content_len: " + content_len);
 					if (!ssl)
 						body = true; // Note: in HTTP/1.1 any method can have a
 										// body, not only "POST"

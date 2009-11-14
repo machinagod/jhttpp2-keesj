@@ -14,6 +14,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import jhttpp2.admin.Jhttpp2Admin;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

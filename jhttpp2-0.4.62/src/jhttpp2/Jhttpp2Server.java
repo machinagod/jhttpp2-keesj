@@ -27,12 +27,12 @@ public class Jhttpp2Server implements Runnable {
 	
 	private static Log log = LogFactory.getLog(Jhttpp2Server.class);
 	private static Log accessLog = LogFactory.getLog("Jhttpp2Server.accesslog");
+	
 	private static final String CRLF = "\r\n";
 	private final String VERSION = "0.4.62";
 	private final String V_SPECIAL = " 2003-05-20";
 	private final String HTTP_VERSION = "HTTP/1.1";
 
-	private final String MAIN_LOGFILE = "server.log";
 	private final String DATA_FILE = "server.data";
 	private final String SERVER_PROPERTIES_FILE = "server.properties";
 
@@ -95,8 +95,6 @@ public class Jhttpp2Server implements Runnable {
 			writeLog(error_msg);
 			return;
 		}
-		// if (debug) remote_debug_vector=new Vector();
-		// remote_debug=false;
 	}
 
 	public Jhttpp2Server() {

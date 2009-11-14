@@ -49,7 +49,10 @@ import java.util.*;
 
 public class WildcardDictionary extends Dictionary implements
 		java.io.Serializable {
-
+	
+	private static final long serialVersionUID = -1930192986340071186L;
+	
+	
 	private Vector keys;
 	private Vector elements;
 

@@ -23,8 +23,8 @@ public class Jhttpp2Launcher {
 
 	public static void main(String[] args) {
 		server = new Jhttpp2Server(true);
-		if (server.error) {
-			System.out.println("Error: " + server.error_msg);
+		if (Jhttpp2Server.error) {
+			System.out.println("Error: " + Jhttpp2Server.error_msg);
 		} else {
 			new Thread(server).start();
 			System.out.println("Running on port " + server.port);

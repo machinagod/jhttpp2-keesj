@@ -123,7 +123,7 @@ public class Jhttpp2Admin {
 						if (a != null)
 							server.setUserAgent(a);
 						a = (String) p.get("block_urls");
-						server.block_urls = (a != null);
+						Jhttpp2Server.block_urls = (a != null);
 						a = (String) p.get("enable_cookies_by_default");
 						server.enableCookiesByDefault(a != null);
 						a = (String) p.get("port");
@@ -298,7 +298,7 @@ public class Jhttpp2Admin {
 					+ txt_field("", "server.filter.http.useragent",
 							"http_useragent", server.getUserAgent())
 					+ chk_option("server.filter.url", "block_urls",
-							server.block_urls)
+							Jhttpp2Server.block_urls)
 					+ chk_option("server.enable-cookies-by-default",
 							"enable_cookies_by_default", server
 									.enableCookiesByDefault())
@@ -390,13 +390,9 @@ public class Jhttpp2Admin {
 	public static String HTMLActionPopup() {
 		StringBuffer out = new StringBuffer();
 
-		Enumeration an = server.getURLActions().elements();
 		int i = 0;
-
-		while (an.hasMoreElements()) {
-			OnURLAction a = (OnURLAction) an.nextElement();
+		for (OnURLAction a : server.getURLActions()) {
 			String aname = a.getDescription();
-
 			out.append("<option value=\"");
 			out.append(i);
 			out.append("\">");
@@ -414,7 +410,6 @@ public class Jhttpp2Admin {
 
 		Enumeration an = server.getWildcardDictionary().elements();
 
-		int i = 0;
 
 		out
 				.append("<form method=\"POST\" action=\"/"

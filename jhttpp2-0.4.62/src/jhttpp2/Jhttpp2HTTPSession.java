@@ -5,16 +5,17 @@ package jhttpp2;
  * This code comes with NO WARRANTY.
  */
 
-import java.net.Socket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import java.io.BufferedOutputStream;
 import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * One HTTP connection
@@ -23,6 +24,7 @@ import java.io.FileInputStream;
  * @author Benjamin Kohl
  */
 public class Jhttpp2HTTPSession extends Thread {
+	private static Log log = LogFactory.getLog(Jhttpp2HTTPSession.class);
 
 	public static final int SC_OK = 0;
 	public static final int SC_CONNECTING_TO_HOST = 1;
@@ -38,7 +40,7 @@ public class Jhttpp2HTTPSession extends Thread {
 	public static final int SC_MOVED_PERMANENTLY = 11;
 	public static final int SC_CONFIG_RQ = 12;
 
-	private static Jhttpp2Server server;
+	private Jhttpp2Server server;
 
 	/** downstream connections */
 	private Socket client;
@@ -61,8 +63,9 @@ public class Jhttpp2HTTPSession extends Thread {
 			try {
 				client.close();
 			} catch (IOException e_io2) {
+				log.debug("Error while closing client (kinda expected)" + e_io);
 			}
-			server.writeLog("Error while creating IO-Streams: " + e_io);
+			log.warn("Error while creating IO-Streams: ", e_io);
 			return;
 		}
 		start();
@@ -110,17 +113,14 @@ public class Jhttpp2HTTPSession extends Thread {
 	}
 
 	public void run() {
-		if (server.debug)
-			server.writeLog("begin http session");
+		log.debug("begin http session");
 		server.increaseNumConnections();
 		try {
 			handleRequest();
 		} catch (IOException e_handleRequest) {
-			if (server.debug)
-				System.out.println(e_handleRequest.toString());
+			log.debug(e_handleRequest.toString());
 		} catch (Exception e) {
-			e.printStackTrace();
-			server.writeLog("Jhttpp2HTTPSession.run(); " + e.getMessage());
+			log.warn("Error hanling request ", e);
 		}
 		try {
 			// close downstream connections
@@ -137,8 +137,7 @@ public class Jhttpp2HTTPSession extends Thread {
 			System.out.println(e_run.getMessage());
 		}
 		server.decreaseNumConnections();
-		if (server.debug)
-			server.writeLog("end http session");
+		log.debug("end http session");
 	}
 
 	/** sends a message to the user */
@@ -315,7 +314,7 @@ public class Jhttpp2HTTPSession extends Thread {
 					}
 					break; // return from main loop.
 				} else { // also an error because we are not connected (or to
-							// the wrong host)
+					// the wrong host)
 					// Creates a new connection to a remote host.
 					if (!notConnected()) {
 						try {
@@ -353,21 +352,21 @@ public class Jhttpp2HTTPSession extends Thread {
 						break;
 					}
 					if (!in.isTunnel() || (in.isTunnel() && server.use_proxy)) { // no
-																					// SSL-Tunnel
-																					// or
-																					// SSL-Tunnel
-																					// with
-																					// another
-																					// remote
-																					// proxy:
-																					// simply
-																					// forward
-																					// the
-																					// request
+						// SSL-Tunnel
+						// or
+						// SSL-Tunnel
+						// with
+						// another
+						// remote
+						// proxy:
+						// simply
+						// forward
+						// the
+						// request
 						HTTP_out.write(b, 0, numread);
 						HTTP_out.flush();
 					} else { // SSL-Tunnel with "CONNECT": creates a tunnel
-								// connection with the server
+						// connection with the server
 						sendLine(server.getHttpVersion()
 								+ " 200 Connection established");
 						sendLine("Proxy-Agent", server
@@ -376,11 +375,11 @@ public class Jhttpp2HTTPSession extends Thread {
 						out.flush();
 					}
 					remote_in = new Jhttpp2Read(server, this, HTTP_in, out); // reads
-																				// data
-																				// from
-																				// the
-																				// remote
-																				// server
+					// data
+					// from
+					// the
+					// remote
+					// server
 					server.addBytesWritten(numread);
 				}
 			}
@@ -434,9 +433,9 @@ public class Jhttpp2HTTPSession extends Thread {
 		if (filename.endsWith("/"))
 			filename += "index.html"; // add index.html, if ending with /
 		File file = new File("htdocs/" + filename); // access only files in
-													// "htdocs"
+		// "htdocs"
 		if (!file.exists() || !file.canRead() // be sure that we can read the
-												// file
+				// file
 				|| filename.indexOf("..") != -1 // don't allow ".." !!!
 				|| file.isDirectory()) { // dont't read if it's a directory
 			sendErrorMSG(404, "The requested file /" + filename
@@ -445,7 +444,7 @@ public class Jhttpp2HTTPSession extends Thread {
 		}
 		int pos = filename.lastIndexOf("."); // MIME type of the specified file
 		String content_type = "text/plain"; // all unknown content types will be
-											// marked as text/plain
+		// marked as text/plain
 		if (pos != -1) {
 			String extension = filename.substring(pos + 1);
 			if (extension.equalsIgnoreCase("htm")
@@ -500,7 +499,7 @@ public class Jhttpp2HTTPSession extends Thread {
 		Jhttpp2Admin admin = null;
 		String filename = in.url;
 		if (in.post_data_len > 0) { // if the client used "POST" then append the
-									// data to the filename
+			// data to the filename
 			filename = filename
 					+ "?"
 					+ new String(b, in.getHeaderLength() - in.post_data_len,
@@ -520,7 +519,7 @@ public class Jhttpp2HTTPSession extends Thread {
 		int adminlen = adminpage.length();
 		if (adminlen < 1) {
 			sendErrorMSG(500, "Error Message from the Web-Admin modul: "
-					+ admin.error_msg);
+					+ Jhttpp2Admin.error_msg);
 		} else {
 			sendHeader(200, "text/html", adminlen);
 			endHeader();

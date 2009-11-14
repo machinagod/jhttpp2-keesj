@@ -11,8 +11,9 @@ package jhttpp2;
  */
 
 public class OnURLAction implements java.io.Serializable {
-
-	private String customerrortext, desc, httppath, newlocation;
+	private static final long serialVersionUID = -1914501414888228949L;
+	
+	private String customerrortext, desc, newlocation;
 	private boolean log, block, customtext, http_rq, anotherlocation;
 
 	public OnURLAction(String desc) {
@@ -64,7 +65,6 @@ public class OnURLAction implements java.io.Serializable {
 
 	public void setHTTPAction(boolean http_rq, String httppath) {
 		this.http_rq = http_rq;
-		this.httppath = httppath;
 	}
 
 	public String getCustomErrorText() {

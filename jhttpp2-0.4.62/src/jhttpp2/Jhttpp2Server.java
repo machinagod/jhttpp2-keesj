@@ -14,11 +14,19 @@ import java.net.BindException;
 
 import java.io.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.Properties;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class Jhttpp2Server implements Runnable {
+	
+	private static Log log = LogFactory.getLog(Jhttpp2Server.class);
+	private static Log accessLog = LogFactory.getLog("Jhttpp2Server.accesslog");
 	private static final String CRLF = "\r\n";
 	private final String VERSION = "0.4.62";
 	private final String V_SPECIAL = " 2003-05-20";
@@ -30,8 +38,6 @@ public class Jhttpp2Server implements Runnable {
 
 	private String http_useragent = "Mozilla/4.0 (compatible; MSIE 4.0; WindowsNT 5.0)";
 	private ServerSocket listen;
-	private BufferedWriter logfile;
-	private BufferedWriter access_logfile;
 	private Properties serverproperties = null;
 
 	private long bytesread;
@@ -40,7 +46,7 @@ public class Jhttpp2Server implements Runnable {
 
 	private boolean enable_cookies_by_default = true;
 	private WildcardDictionary dic = new WildcardDictionary();
-	private Vector urlactions = new Vector();
+	private List<OnURLAction> urlactions = new ArrayList<OnURLAction>();
 
 	public final int DEFAULT_SERVER_PORT = 8088;
 	public final String WEB_CONFIG_FILE = "admin/jp2-config";
@@ -67,15 +73,6 @@ public class Jhttpp2Server implements Runnable {
 	public boolean www_server = true;
 
 	void init() {
-		try {
-			logfile = new BufferedWriter(new FileWriter(MAIN_LOGFILE, true));
-		} catch (Exception e_logfile) {
-			setErrorMsg("Unable to open the main log file.");
-			if (logfile == null)
-				setErrorMsg("jHTTPp2 need write permission for the file "
-						+ MAIN_LOGFILE);
-			error_msg += " " + e_logfile.getMessage();
-		}
 		writeLog("server startup...");
 
 		try {
@@ -272,8 +269,6 @@ public class Jhttpp2Server implements Runnable {
 
 		try {
 
-			access_logfile = new BufferedWriter(new FileWriter(
-					log_access_filename, true));
 			// Restore the WildcardDioctionary and the URLActions with the
 			// ObjectInputStream (settings.dat)...
 			ObjectInputStream obj_in;
@@ -332,27 +327,11 @@ public class Jhttpp2Server implements Runnable {
 	 * @since 0.2.21
 	 */
 	public void writeLog(String s, boolean b) {
-		try {
-			s = new Date().toString() + " " + s;
-			logfile.write(s, 0, s.length());
-			if (b)
-				logfile.newLine();
-			logfile.flush();
-			if (debug)
-				System.out.println(s);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		log.debug(s);
 	}
 
 	public void closeLog() {
-		try {
-			writeLog("Server shutdown.");
-			logfile.flush();
-			logfile.close();
-			access_logfile.close();
-		} catch (Exception e) {
-		}
+		writeLog("Server shutdown.");
 	}
 
 	public void addBytesRead(long read) {
@@ -408,7 +387,7 @@ public class Jhttpp2Server implements Runnable {
 		return dic;
 	}
 
-	public Vector getURLActions() {
+	public List<OnURLAction> getURLActions() {
 		return urlactions;
 	}
 
@@ -461,13 +440,7 @@ public class Jhttpp2Server implements Runnable {
 	 * @since 0.4.10a
 	 */
 	public void logAccess(String s) {
-		try {
-			access_logfile.write("[" + new Date().toString() + "] " + s
-					+ "\r\n");
-			access_logfile.flush();
-		} catch (Exception e) {
-			writeLog("Jhttpp2Server.access(String): " + e.getMessage());
-		}
+		accessLog.info(s);
 	}
 
 	public void shutdownServer() {

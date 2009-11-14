@@ -9,6 +9,8 @@ package jhttpp2;
  */
 
 public class Jhttpp2URLMatch implements java.io.Serializable {
+	private static final long serialVersionUID = -4910044665225395920L;
+
 	String match;
 	String desc;
 	boolean cookies_enabled;

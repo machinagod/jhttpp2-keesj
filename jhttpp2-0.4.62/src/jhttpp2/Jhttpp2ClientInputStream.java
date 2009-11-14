@@ -17,7 +17,6 @@ import java.net.UnknownHostException;
  * @author Benjamin Kohl
  */
 public class Jhttpp2ClientInputStream extends BufferedInputStream {
-	private boolean filter = false;
 	private String buf;
 	private int lread = 0;
 	/**
@@ -32,7 +31,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 	 * This is set to true with requests with bodies, like "POST"
 	 */
 	private boolean body = false;
-	private static Jhttpp2Server server;
+	private Jhttpp2Server server;
 	private Jhttpp2HTTPSession connection;
 	private InetAddress remote_host;
 	private String remote_host_name;
@@ -70,7 +69,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 	 * @exception IOException
 	 */
 	public int read(byte[] a) throws IOException {
-		statuscode = connection.SC_OK;
+		statuscode = Jhttpp2HTTPSession.SC_OK;
 		if (ssl)
 			return super.read(a);
 		boolean cookies_enabled = server.enableCookiesByDefault();
@@ -87,13 +86,13 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 				int methodID = server.getHttpMethod(buf);
 				switch (methodID) {
 				case -1:
-					statuscode = connection.SC_NOT_SUPPORTED;
+					statuscode = Jhttpp2HTTPSession.SC_NOT_SUPPORTED;
 					break;
 				case 2:
 					ssl = true;
 				default:
 					InetAddress host = parseRequest(buf, methodID);
-					if (statuscode != connection.SC_OK)
+					if (statuscode != Jhttpp2HTTPSession.SC_OK)
 						break; // error occured, go on with the next line
 
 					if (!server.use_proxy && !ssl) {
@@ -107,15 +106,15 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 						if (server.debug)
 							server
 									.writeLog("read_f: STATE_CONNECT_TO_NEW_HOST");
-						statuscode = connection.SC_CONNECTING_TO_HOST;
+						statuscode = Jhttpp2HTTPSession.SC_CONNECTING_TO_HOST;
 						remote_host = host;
 					}
 					/*
 					 * ------------------------- url blocking (only "GET"
 					 * method) -------------------------
 					 */
-					if (server.block_urls && methodID == 0
-							&& statuscode != connection.SC_FILE_REQUEST) {
+					if (Jhttpp2Server.block_urls && methodID == 0
+							&& statuscode != Jhttpp2HTTPSession.SC_FILE_REQUEST) {
 						if (server.debug)
 							System.out.println("Searching match...");
 						Jhttpp2URLMatch match = server
@@ -126,16 +125,16 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 							cookies_enabled = match.getCookiesEnabled();
 							if (match.getActionIndex() == -1)
 								break;
-							OnURLAction action = (OnURLAction) server
-									.getURLActions().elementAt(
+							OnURLAction action =  server
+									.getURLActions().get(
 											match.getActionIndex());
 							if (action.onAccesssDeny()) {
-								statuscode = connection.SC_URL_BLOCKED;
+								statuscode = Jhttpp2HTTPSession.SC_URL_BLOCKED;
 								if (action.onAccessDenyWithCustomText())
 									errordescription = action
 											.getCustomErrorText();
 							} else if (action.onAccessRedirect()) {
-								statuscode = connection.SC_MOVED_PERMANENTLY;
+								statuscode = Jhttpp2HTTPSession.SC_MOVED_PERMANENTLY;
 								errordescription = action.newLocation();
 							}
 						}// end if match!=null)
@@ -155,7 +154,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 					try {
 						content_len = Integer.parseInt(clen);
 					} catch (NumberFormatException e) {
-						statuscode = connection.SC_CLIENT_ERROR;
+						statuscode = Jhttpp2HTTPSession.SC_CLIENT_ERROR;
 					}
 					if (server.debug)
 						server.writeLog("read_f: content_len: " + content_len);
@@ -213,7 +212,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 			if (server.debug)
 				server
 						.writeLog("header_length=0, setting status to SC_CONNECTION_CLOSED (buggy request)");
-			statuscode = connection.SC_CONNECTION_CLOSED;
+			statuscode = Jhttpp2HTTPSession.SC_CONNECTION_CLOSED;
 		}
 
 		for (int i = 0; i < header_length; i++)
@@ -232,7 +231,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 			body = false;
 		}
 
-		return (statuscode == connection.SC_OK) ? header_length : -1; // return
+		return (statuscode == Jhttpp2HTTPSession.SC_OK) ? header_length : -1; // return
 																		// -1
 																		// with
 																		// an
@@ -281,9 +280,9 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 				url = a.substring(a.indexOf(" ") + 1, a.lastIndexOf(" "));
 				if (method_index == 0) { // method_index==0 --> GET
 					if (url.indexOf(server.WEB_CONFIG_FILE) != -1)
-						statuscode = connection.SC_CONFIG_RQ;
+						statuscode = Jhttpp2HTTPSession.SC_CONFIG_RQ;
 					else
-						statuscode = connection.SC_FILE_REQUEST;
+						statuscode = Jhttpp2HTTPSession.SC_FILE_REQUEST;
 				} else {
 					if (method_index == 1
 							&& url.indexOf(server.WEB_CONFIG_FILE) != -1) { // allow
@@ -292,9 +291,9 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 																			// admin
 																			// log
 																			// in
-						statuscode = connection.SC_CONFIG_RQ;
+						statuscode = Jhttpp2HTTPSession.SC_CONFIG_RQ;
 					} else {
-						statuscode = connection.SC_INTERNAL_SERVER_ERROR;
+						statuscode = Jhttpp2HTTPSession.SC_INTERNAL_SERVER_ERROR;
 						errordescription = "This WWW proxy supports only the \"GET\" method while acting as webserver.";
 					}
 				}
@@ -305,7 +304,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 		pos = f.indexOf(" "); // locate space, should be the space before
 								// "HTTP/1.1"
 		if (pos == -1) { // buggy request
-			statuscode = connection.SC_CLIENT_ERROR;
+			statuscode = Jhttpp2HTTPSession.SC_CLIENT_ERROR;
 			errordescription = "Your browser sent an invalid request: \"" + a
 					+ "\"";
 			return null;
@@ -347,16 +346,16 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 					&& address.equals(InetAddress.getLocalHost())) {
 				if (url.indexOf(server.WEB_CONFIG_FILE) != -1
 						&& (method_index == 0 || method_index == 1))
-					statuscode = connection.SC_CONFIG_RQ;
+					statuscode = Jhttpp2HTTPSession.SC_CONFIG_RQ;
 				else if (method_index > 0) {
-					statuscode = connection.SC_INTERNAL_SERVER_ERROR;
+					statuscode = Jhttpp2HTTPSession.SC_INTERNAL_SERVER_ERROR;
 					errordescription = "This WWW proxy supports only the \"GET\" method while acting as webserver.";
 				} else
-					statuscode = connection.SC_FILE_REQUEST;
+					statuscode = Jhttpp2HTTPSession.SC_FILE_REQUEST;
 			}
 		} catch (UnknownHostException e_u_host) {
 			if (!server.use_proxy)
-				statuscode = connection.SC_HOST_NOT_FOUND;
+				statuscode = Jhttpp2HTTPSession.SC_HOST_NOT_FOUND;
 		}
 		return address;
 	}

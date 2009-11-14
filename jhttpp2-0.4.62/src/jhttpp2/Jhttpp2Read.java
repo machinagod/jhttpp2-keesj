@@ -20,7 +20,7 @@ public class Jhttpp2Read extends Thread {
 	private BufferedInputStream in;
 	private BufferedOutputStream out;
 	private Jhttpp2HTTPSession connection;
-	private static Jhttpp2Server server;
+	private Jhttpp2Server server;
 
 	public Jhttpp2Read(Jhttpp2Server server, Jhttpp2HTTPSession connection,
 			BufferedInputStream l_in, BufferedOutputStream l_out) {
@@ -53,7 +53,7 @@ public class Jhttpp2Read extends Thread {
 		}
 
 		try {
-			if (connection.getStatus() != connection.SC_CONNECTING_TO_HOST) // *uaaahhh*:
+			if (connection.getStatus() != Jhttpp2HTTPSession.SC_CONNECTING_TO_HOST) // *uaaahhh*:
 																			// fixes
 																			// a
 																			// very

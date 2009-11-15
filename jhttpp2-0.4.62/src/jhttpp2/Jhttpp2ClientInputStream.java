@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.SortedMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Jhttpp2ClientInputStream extends BufferedInputStream {
 	private static Log log = LogFactory.getLog(Jhttpp2ClientInputStream.class);
-	
+
 	private String buf;
 	private int lread = 0;
 	/**
@@ -120,8 +121,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 					 */
 					if (Jhttpp2Server.block_urls && methodID == 0
 							&& statuscode != Jhttpp2HTTPSession.SC_FILE_REQUEST) {
-						if (server.debug)
-							System.out.println("Searching match...");
+						log.debug("Searching match... for " + this.remote_host_name + url);
 						Jhttpp2URLMatch match = server
 								.findMatch(this.remote_host_name + url);
 						if (match != null) {
@@ -129,9 +129,8 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 							cookies_enabled = match.getCookiesEnabled();
 							if (match.getActionIndex() == -1)
 								break;
-							OnURLAction action =  server
-									.getURLActions().get(
-											match.getActionIndex());
+							OnURLAction action = server.getURLActions().get(
+									match.getActionIndex());
 							if (action.onAccesssDeny()) {
 								statuscode = Jhttpp2HTTPSession.SC_URL_BLOCKED;
 								if (action.onAccessDenyWithCustomText())
@@ -163,7 +162,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 					log.debug("read_f: content_len: " + content_len);
 					if (!ssl)
 						body = true; // Note: in HTTP/1.1 any method can have a
-										// body, not only "POST"
+					// body, not only "POST"
 				} else if (server.startsWith(buf, "Proxy-Connection:")) {
 					if (!server.use_proxy)
 						buf = null;
@@ -189,10 +188,10 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 				 *------------------------------------------------*/
 				else if (server.filter_http) {
 					if (server.startsWith(buf, "Referer:")) {// removes
-																// "Referer"
+						// "Referer"
 						buf = null;
 					} else if (server.startsWith(buf, "User-Agent")) // changes
-																		// User-Agent
+					// User-Agent
 					{
 						buf = "User-Agent: " + server.getUserAgent() + "\r\n";
 						lread = buf.length();
@@ -208,7 +207,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 			buf = getLine();
 		}
 		rq += buf; // adds last line (should be an empty line) to the header
-					// String
+		// String
 		header_length += lread;
 
 		if (header_length == 0) {
@@ -225,20 +224,20 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 			post_data_len = 0;
 			while (post_data_len < content_len) {
 				a[header_length + post_data_len] = (byte) read(); // writes data
-																	// into the
-																	// array
+				// into the
+				// array
 				post_data_len++;
 			}
 			header_length += content_len; // add the body-length to the
-											// header-length
+			// header-length
 			body = false;
 		}
 
 		return (statuscode == Jhttpp2HTTPSession.SC_OK) ? header_length : -1; // return
-																		// -1
-																		// with
-																		// an
-																		// error
+		// -1
+		// with
+		// an
+		// error
 	}
 
 	/**
@@ -269,8 +268,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 	 *         statuscode!=SC_OK
 	 */
 	public InetAddress parseRequest(String a, int method_index) {
-		if (server.debug)
-			server.writeLog(a);
+		log.debug(a);
 		String f;
 		int pos;
 		url = "";
@@ -289,11 +287,11 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 				} else {
 					if (method_index == 1
 							&& url.indexOf(server.WEB_CONFIG_FILE) != -1) { // allow
-																			// "POST"
-																			// for
-																			// admin
-																			// log
-																			// in
+						// "POST"
+						// for
+						// admin
+						// log
+						// in
 						statuscode = Jhttpp2HTTPSession.SC_CONFIG_RQ;
 					} else {
 						statuscode = Jhttpp2HTTPSession.SC_INTERNAL_SERVER_ERROR;
@@ -305,7 +303,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 			f = a.substring(pos + 3); // removes "http://"
 		}
 		pos = f.indexOf(" "); // locate space, should be the space before
-								// "HTTP/1.1"
+		// "HTTP/1.1"
 		if (pos == -1) { // buggy request
 			statuscode = Jhttpp2HTTPSession.SC_CLIENT_ERROR;
 			errordescription = "Your browser sent an invalid request: \"" + a
@@ -321,7 +319,7 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 			f = f.substring(0, pos); // reduce string to the hostname
 		} else
 			url = "/"; // occurs with this request:
-						// "GET http://localhost HTTP/1.1"
+		// "GET http://localhost HTTP/1.1"
 		pos = f.indexOf(":"); // check for the portnumber
 		if (pos != -1) {
 			String l_port = f.substring(pos + 1);
@@ -338,6 +336,14 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 		} else
 			remote_port = 80;
 		remote_host_name = f;
+		
+		SortedMap<String, String> map = server.getHostRedirects();
+		for (String redirectHost : map.keySet() ) {
+			if(redirectHost.equals(remote_host_name)){
+				f = map.get(redirectHost);
+				log.info("Redirecting host " + redirectHost + " to " + map.get(redirectHost));
+			}
+		}
 		InetAddress address = null;
 		if (server.log_access)
 			server.logAccess(connection.getLocalSocket().getInetAddress()

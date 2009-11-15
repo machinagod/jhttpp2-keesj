@@ -9,6 +9,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Properties;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,12 +43,15 @@ public class Jhttpp2Launcher implements Jhttpp2SettingsSaverInteface {
 		server.setServerProperties(loadServerProperties());
 		restoreSettings();
 		server.setSettingsSaver(this);
+		SortedMap<String, String> hostRedirects= new TreeMap<String, String>();
+		hostRedirects.put("redirect.me.com", "localhost");
+		server.setHostRedirects(hostRedirects);
 		server.init();
 		if (Jhttpp2Server.error) {
 			System.out.println("Error: " + Jhttpp2Server.error_msg);
 		} else {
 			new Thread(server).start();
-			System.out.println("Running on port " + server.port);
+			log.info("Running on port " + server.port);
 		}
 	}
 

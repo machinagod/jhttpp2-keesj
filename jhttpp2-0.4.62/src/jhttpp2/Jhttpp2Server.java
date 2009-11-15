@@ -16,12 +16,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class Jhttpp2Server implements Runnable {
-
 	private static Log log = LogFactory.getLog(Jhttpp2Server.class);
 	private static Log accessLog = LogFactory.getLog("Jhttpp2Server.accesslog");
 
@@ -42,6 +43,16 @@ public class Jhttpp2Server implements Runnable {
 	private boolean enable_cookies_by_default = true;
 	private WildcardDictionary dic = new WildcardDictionary();
 	private List<OnURLAction> urlactions = new ArrayList<OnURLAction>();
+	
+	private SortedMap<String,String> hostRedirects;
+
+	public SortedMap<String, String> getHostRedirects() {
+		return hostRedirects;
+	}
+
+	public void setHostRedirects(SortedMap<String, String> hostRedirects) {
+		this.hostRedirects = hostRedirects;
+	}
 
 	public final int DEFAULT_SERVER_PORT = 8088;
 	public final String WEB_CONFIG_FILE = "admin/jp2-config";
@@ -112,7 +123,7 @@ public class Jhttpp2Server implements Runnable {
 	}
 
 	/**
-	 * calls init(), sets up the serverport and starts for each connection new
+	 * sets up the serverport and starts for each connection new
 	 * Jhttpp2Connection
 	 */
 	void serve() {
@@ -123,8 +134,7 @@ public class Jhttpp2Server implements Runnable {
 				new Jhttpp2HTTPSession(this, client);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			writeLog("Exception in Jhttpp2Server.serve(): " + e.toString());
+			log.warn("Exception in Jhttpp2Server.serve(): " , e);
 		}
 	}
 
@@ -138,7 +148,7 @@ public class Jhttpp2Server implements Runnable {
 	}
 
 	/**
-	 * Tests what method is used with the reqest
+	 * Tests what method is used with the request
 	 * 
 	 * @return -1 if the server doesn't support the method
 	 */
@@ -178,12 +188,6 @@ public class Jhttpp2Server implements Runnable {
 	}
 
 	/**
-	 * restores all Jhttpp2 options from "settings.dat"
-	 * 
-	 * @since 0.2.10
-	 */
-
-	/**
 	 * @return the HTTP version used by jHTTPp2
 	 */
 	public String getHttpVersion() {
@@ -205,7 +209,7 @@ public class Jhttpp2Server implements Runnable {
 	}
 
 	/**
-	 * writes into the server log file and adds a new line
+	 * writes into the server log file.
 	 * 
 	 * @since 0.2.21
 	 */

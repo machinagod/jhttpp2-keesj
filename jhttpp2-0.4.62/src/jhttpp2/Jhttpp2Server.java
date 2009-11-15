@@ -11,13 +11,13 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.SortedMap;
-import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,13 +44,13 @@ public class Jhttpp2Server implements Runnable {
 	private WildcardDictionary dic = new WildcardDictionary();
 	private List<OnURLAction> urlactions = new ArrayList<OnURLAction>();
 	
-	private SortedMap<String,String> hostRedirects;
+	private SortedMap<String,URL> hostRedirects;
 
-	public SortedMap<String, String> getHostRedirects() {
+	public SortedMap<String, URL> getHostRedirects() {
 		return hostRedirects;
 	}
 
-	public void setHostRedirects(SortedMap<String, String> hostRedirects) {
+	public void setHostRedirects(SortedMap<String, URL> hostRedirects) {
 		this.hostRedirects = hostRedirects;
 	}
 

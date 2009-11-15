@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 import java.util.SortedMap;
@@ -43,8 +45,12 @@ public class Jhttpp2Launcher implements Jhttpp2SettingsSaverInteface {
 		server.setServerProperties(loadServerProperties());
 		restoreSettings();
 		server.setSettingsSaver(this);
-		SortedMap<String, String> hostRedirects= new TreeMap<String, String>();
-		hostRedirects.put("redirect.me.com", "localhost");
+		SortedMap<String, URL> hostRedirects= new TreeMap<String, URL>();
+		try {
+			hostRedirects.put("redirect.me.com", new URL("http://localhost:80/"));
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 		server.setHostRedirects(hostRedirects);
 		server.init();
 		if (Jhttpp2Server.error) {

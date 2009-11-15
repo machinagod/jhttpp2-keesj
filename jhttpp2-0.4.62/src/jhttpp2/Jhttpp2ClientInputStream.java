@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.SortedMap;
 
@@ -337,11 +338,15 @@ public class Jhttpp2ClientInputStream extends BufferedInputStream {
 			remote_port = 80;
 		remote_host_name = f;
 		
-		SortedMap<String, String> map = server.getHostRedirects();
+		SortedMap<String, URL> map = server.getHostRedirects();
 		for (String redirectHost : map.keySet() ) {
 			if(redirectHost.equals(remote_host_name)){
-				f = map.get(redirectHost);
-				log.info("Redirecting host " + redirectHost + " to " + map.get(redirectHost));
+				URL u = map.get(redirectHost);
+				f = u.getHost();
+				if (u.getPort() != -1){
+					remote_port = u.getPort();
+				}
+				log.debug("Redirecting host " + redirectHost + " to " + f + " port " + remote_port);
 			}
 		}
 		InetAddress address = null;

@@ -6,35 +6,30 @@ package jhttpp2;
  * More Information and documentation: HTTP://jhttp2.sourceforge.net/
  */
 
+import java.io.IOException;
+import java.net.BindException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.net.InetAddress;
-import java.net.BindException;
-
-import java.io.*;
-
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-import java.util.Properties;
 import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class Jhttpp2Server implements Runnable {
-	
+
 	private static Log log = LogFactory.getLog(Jhttpp2Server.class);
 	private static Log accessLog = LogFactory.getLog("Jhttpp2Server.accesslog");
-	
+
+	@SuppressWarnings("unused")
 	private static final String CRLF = "\r\n";
 	private final String VERSION = "0.4.62";
 	private final String V_SPECIAL = " 2003-05-20";
 	private final String HTTP_VERSION = "HTTP/1.1";
-
-	private final String DATA_FILE = "server.data";
-	private final String SERVER_PROPERTIES_FILE = "server.properties";
 
 	private String http_useragent = "Mozilla/4.0 (compatible; MSIE 4.0; WindowsNT 5.0)";
 	private ServerSocket listen;
@@ -72,13 +67,19 @@ public class Jhttpp2Server implements Runnable {
 	public boolean webconfig = true;
 	public boolean www_server = true;
 
-	void init() {
-		writeLog("server startup...");
+	
+	private Jhttpp2SettingsSaverInteface settingsSaver;
 
-		try {
-			restoreSettings();
-		} catch (Exception e_load) {
-			setErrorMsg("Error while resoring settings: " + e_load.getMessage());
+	public void init() {
+		writeLog("server startup...");
+		if (serverproperties == null) {
+			log.warn("Server properties should be set prior to init");
+		}
+		if (dic == null) {
+			log.warn("Server dic should be set prior to calling init");
+		}
+		if (urlactions == null) {
+			log.warn("url actions should be set prior to init");
 		}
 		try {
 			listen = new ServerSocket(port);
@@ -98,7 +99,6 @@ public class Jhttpp2Server implements Runnable {
 	}
 
 	public Jhttpp2Server() {
-		init();
 	}
 
 	public Jhttpp2Server(boolean b) {
@@ -109,7 +109,6 @@ public class Jhttpp2Server implements Runnable {
 						+ "Copyright (c) 2001-2003 Benjamin Kohl <bkohl@users.sourceforge.net>\r\n"
 						+ "This software comes with ABSOLUTELY NO WARRANTY OF ANY KIND.\r\n"
 						+ "http://jhttp2.sourceforge.net/");
-		init();
 	}
 
 	/**
@@ -179,115 +178,10 @@ public class Jhttpp2Server implements Runnable {
 	}
 
 	/**
-	 * saves all settings with a ObjectOutputStream into a file
-	 * 
-	 * @since 0.2.10
-	 */
-	public void saveSettings() throws IOException {
-		serverproperties.setProperty("server.http-proxy",
-				new Boolean(use_proxy).toString());
-		serverproperties.setProperty("server.http-proxy.hostname", proxy
-				.getHostAddress());
-		serverproperties.setProperty("server.http-proxy.port", new Integer(
-				proxy_port).toString());
-		serverproperties.setProperty("server.filter.http", new Boolean(
-				filter_http).toString());
-		serverproperties.setProperty("server.filter.url", new Boolean(
-				block_urls).toString());
-		serverproperties.setProperty("server.filter.http.useragent",
-				http_useragent);
-		serverproperties.setProperty("server.enable-cookies-by-default",
-				new Boolean(enable_cookies_by_default).toString());
-		serverproperties.setProperty("server.debug-logging", new Boolean(debug)
-				.toString());
-		serverproperties.setProperty("server.port", new Integer(port)
-				.toString());
-		serverproperties.setProperty("server.access.log", new Boolean(
-				log_access).toString());
-		serverproperties.setProperty("server.access.log.filename",
-				log_access_filename);
-		serverproperties.setProperty("server.webconfig", new Boolean(webconfig)
-				.toString());
-		serverproperties.setProperty("server.www", new Boolean(www_server)
-				.toString());
-		serverproperties.setProperty("server.webconfig.username", config_user);
-		serverproperties.setProperty("server.webconfig.password",
-				config_password);
-		storeServerProperties();
-
-		ObjectOutputStream file = new ObjectOutputStream(new FileOutputStream(
-				DATA_FILE));
-		file.writeObject(dic);
-		file.writeObject(urlactions);
-		file.close();
-	}
-
-	/**
 	 * restores all Jhttpp2 options from "settings.dat"
 	 * 
 	 * @since 0.2.10
 	 */
-	public void restoreSettings()// throws Exception
-	{
-		getServerProperties();
-		use_proxy = new Boolean(serverproperties.getProperty(
-				"server.http-proxy", "false")).booleanValue();
-		try {
-			proxy = InetAddress.getByName(serverproperties.getProperty(
-					"server.http-proxy.hostname", "127.0.0.1"));
-		} catch (UnknownHostException e) {
-		}
-		proxy_port = new Integer(serverproperties.getProperty(
-				"server.http-proxy.port", "8080")).intValue();
-		block_urls = new Boolean(serverproperties.getProperty(
-				"server.filter.url", "false")).booleanValue();
-		http_useragent = serverproperties.getProperty(
-				"server.filter.http.useragent",
-				"Mozilla/4.0 (compatible; MSIE 4.0; WindowsNT 5.0)");
-		filter_http = new Boolean(serverproperties.getProperty(
-				"server.filter.http", "false")).booleanValue();
-		enable_cookies_by_default = new Boolean(serverproperties.getProperty(
-				"server.enable-cookies-by-default", "true")).booleanValue();
-		debug = new Boolean(serverproperties.getProperty(
-				"server.debug-logging", "false")).booleanValue();
-		port = new Integer(serverproperties.getProperty("server.port", "8088"))
-				.intValue();
-		log_access = new Boolean(serverproperties.getProperty(
-				"server.access.log", "false")).booleanValue();
-		log_access_filename = serverproperties.getProperty(
-				"server.access.log.filename", "paccess.log");
-		webconfig = new Boolean(serverproperties.getProperty(
-				"server.webconfig", "true")).booleanValue();
-		www_server = new Boolean(serverproperties.getProperty("server.www",
-				"true")).booleanValue();
-		config_user = serverproperties.getProperty("server.webconfig.username",
-				"root");
-		config_password = serverproperties.getProperty(
-				"server.webconfig.password", "geheim");
-
-		try {
-
-			// Restore the WildcardDioctionary and the URLActions with the
-			// ObjectInputStream (settings.dat)...
-			ObjectInputStream obj_in;
-			File file = new File(DATA_FILE);
-			if (!file.exists()) {
-				if (!file.createNewFile() || !file.canWrite()) {
-					setErrorMsg("Can't create or write to file "
-							+ file.toString());
-				} else
-					saveSettings();
-			}
-
-			obj_in = new ObjectInputStream(new FileInputStream(file));
-			dic = (WildcardDictionary) obj_in.readObject();
-			urlactions = (Vector) obj_in.readObject();
-			obj_in.close();
-		} catch (IOException e) {
-			setErrorMsg("restoreSettings(): " + e.getMessage());
-		} catch (ClassNotFoundException e_class_not_found) {
-		}
-	}
 
 	/**
 	 * @return the HTTP version used by jHTTPp2
@@ -381,14 +275,6 @@ public class Jhttpp2Server implements Runnable {
 		return (Jhttpp2URLMatch) dic.get(url);
 	}
 
-	public WildcardDictionary getWildcardDictionary() {
-		return dic;
-	}
-
-	public List<OnURLAction> getURLActions() {
-		return urlactions;
-	}
-
 	public boolean enableCookiesByDefault() {
 		return this.enable_cookies_by_default;
 	}
@@ -405,33 +291,75 @@ public class Jhttpp2Server implements Runnable {
 	/**
 	 * @since 0.4.10a
 	 */
-	public Properties getServerProperties() {
-		if (serverproperties == null) {
-			serverproperties = new Properties();
-			try {
-				serverproperties.load(new DataInputStream(new FileInputStream(
-						SERVER_PROPERTIES_FILE)));
-			} catch (IOException e) {
-				writeLog("getServerProperties(): " + e.getMessage());
-			}
+	public void setServerProperties(Properties p) {
+		serverproperties = p;
+		use_proxy = new Boolean(serverproperties.getProperty(
+				"server.http-proxy", "false")).booleanValue();
+		try {
+			proxy = InetAddress.getByName(serverproperties.getProperty(
+					"server.http-proxy.hostname", "127.0.0.1"));
+		} catch (UnknownHostException e) {
 		}
-		return serverproperties;
+		proxy_port = new Integer(serverproperties.getProperty(
+				"server.http-proxy.port", "8080")).intValue();
+		block_urls = new Boolean(serverproperties.getProperty(
+				"server.filter.url", "false")).booleanValue();
+		http_useragent = serverproperties.getProperty(
+				"server.filter.http.useragent",
+				"Mozilla/4.0 (compatible; MSIE 4.0; WindowsNT 5.0)");
+		filter_http = new Boolean(serverproperties.getProperty(
+				"server.filter.http", "false")).booleanValue();
+		enable_cookies_by_default = new Boolean(serverproperties.getProperty(
+				"server.enable-cookies-by-default", "true")).booleanValue();
+		debug = new Boolean(serverproperties.getProperty(
+				"server.debug-logging", "false")).booleanValue();
+		port = new Integer(serverproperties.getProperty("server.port", "8088"))
+				.intValue();
+		log_access = new Boolean(serverproperties.getProperty(
+				"server.access.log", "false")).booleanValue();
+		log_access_filename = serverproperties.getProperty(
+				"server.access.log.filename", "paccess.log");
+		webconfig = new Boolean(serverproperties.getProperty(
+				"server.webconfig", "true")).booleanValue();
+		www_server = new Boolean(serverproperties.getProperty("server.www",
+				"true")).booleanValue();
+		config_user = serverproperties.getProperty("server.webconfig.username",
+				"root");
+		config_password = serverproperties.getProperty(
+				"server.webconfig.password", "geheim");
 	}
 
-	/**
-	 * @since 0.4.10a
-	 */
-	public void storeServerProperties() {
-		if (serverproperties == null)
-			return;
-		try {
-			serverproperties
-					.store(
-							new FileOutputStream(SERVER_PROPERTIES_FILE),
-							"Jhttpp2Server main properties. Look at the README file for further documentation.");
-		} catch (IOException e) {
-			writeLog("storeServerProperties(): " + e.getMessage());
-		}
+	public Properties getServerProperties() {
+		serverproperties.setProperty("server.http-proxy",
+				new Boolean(use_proxy).toString());
+		serverproperties.setProperty("server.http-proxy.hostname", proxy
+				.getHostAddress());
+		serverproperties.setProperty("server.http-proxy.port", new Integer(
+				proxy_port).toString());
+		serverproperties.setProperty("server.filter.http", new Boolean(
+				filter_http).toString());
+		serverproperties.setProperty("server.filter.url", new Boolean(
+				block_urls).toString());
+		serverproperties.setProperty("server.filter.http.useragent",
+				http_useragent);
+		serverproperties.setProperty("server.enable-cookies-by-default",
+				new Boolean(enable_cookies_by_default).toString());
+		serverproperties.setProperty("server.debug-logging", new Boolean(debug)
+				.toString());
+		serverproperties.setProperty("server.port", new Integer(port)
+				.toString());
+		serverproperties.setProperty("server.access.log", new Boolean(
+				log_access).toString());
+		serverproperties.setProperty("server.access.log.filename",
+				log_access_filename);
+		serverproperties.setProperty("server.webconfig", new Boolean(webconfig)
+				.toString());
+		serverproperties.setProperty("server.www", new Boolean(www_server)
+				.toString());
+		serverproperties.setProperty("server.webconfig.username", config_user);
+		serverproperties.setProperty("server.webconfig.password",
+				config_password);
+		return serverproperties;
 	}
 
 	/**
@@ -444,6 +372,30 @@ public class Jhttpp2Server implements Runnable {
 	public void shutdownServer() {
 		closeLog();
 		System.exit(0);
+	}
+
+	public void setWildcardDictionary(WildcardDictionary dic) {
+		this.dic = dic;
+	}
+
+	public WildcardDictionary getWildcardDictionary() {
+		return dic;
+	}
+
+	public void setURLActions(List<OnURLAction> urlactions) {
+		this.urlactions = urlactions;
+	}
+
+	public List<OnURLAction> getURLActions() {
+		return urlactions;
+	}
+
+	public Jhttpp2SettingsSaverInteface getSettingsSaver() {
+		return settingsSaver;
+	}
+
+	public void setSettingsSaver(Jhttpp2SettingsSaverInteface settingsSaver) {
+		this.settingsSaver = settingsSaver;
 	}
 
 }

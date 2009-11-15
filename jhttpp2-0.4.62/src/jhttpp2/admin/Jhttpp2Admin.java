@@ -95,7 +95,7 @@ public class Jhttpp2Admin {
 						} else {
 							if (b.equals(c)) {
 								server.config_password = b;
-								server.saveSettings();
+								server.getSettingsSaver().saveServerSettings();
 								stat = 5;
 								status = "Password sucessfully updated.";
 							}
@@ -151,7 +151,7 @@ public class Jhttpp2Admin {
 						// server.http-proxy.hostname=127.0.0.1
 						// server.http-proxy.port=8080
 
-						server.saveSettings(); // save settings
+						server.getSettingsSaver().saveServerSettings(); // save settings
 						status = "Changes saved.";
 						stat = 4;
 					} else if (command.equals("deletefilter")) {
